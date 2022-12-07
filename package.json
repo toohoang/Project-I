@@ -1,0 +1,26 @@
+{
+  "name": "project-i",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/toohoang/Project-I.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/toohoang/Project-I/issues"
+  },
+  "homepage": "https://github.com/toohoang/Project-I#readme",
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "express.js": "^1.0.0",
+    "firebase": "^9.14.0",
+    "nodemon": "^2.0.20"
+  }
+}
