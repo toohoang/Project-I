@@ -18,7 +18,9 @@
   },
   "homepage": "https://github.com/toohoang/Project-I#readme",
   "dependencies": {
+    "aws-sdk": "^2.1282.0",
     "bcrypt": "^5.1.0",
+    "dotenv": "^16.0.3",
     "express.js": "^1.0.0",
     "firebase": "^9.14.0",
     "nodemon": "^2.0.20"

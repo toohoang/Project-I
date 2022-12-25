@@ -27,6 +27,13 @@ const app= express();
 app.use(express.static('public'));
 app.use(express.json());
 
+//aws
+import aws from "aws-sdk";
+import `dotenv/config`;
+
+//aws setup
+
+
 //routes
 //home route
 app.get('/', (req,res) =>{
@@ -147,8 +154,9 @@ app.get('/dashboard', (req,res) =>{
     res.sendFile('dashboard.html', {root : "public"});
 })
 
-app.listen(3000, () =>{
-    console.log('listening on port 3000');
+//app product
+app.get('/add-product', (req,res) =>{
+    res.sendFile('add-product.html', {root: "public"});
 })
 
 //404route
@@ -160,3 +168,6 @@ app.use((req,res) =>{
     res.redirect('/404')
 })
 
+app.listen(3000, () =>{
+    console.log('listening on port 3000');
+})

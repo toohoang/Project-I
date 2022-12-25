@@ -1,29 +1,26 @@
 #include<bits/stdc++.h>
 using namespace std;
-typedef pair<int,int> ii;
-map<int,ii>cou;
-int main(){
-    vector<int>a1,a2,x,y;
-    int n,m;
-    cin>>n>>m;
-    
-    for (int i = 0; i < n; i++)
-        cin>>a1[i];
-    for (int i = 0; i < m; i++)
-        cin>>a2[i];
 
-    if(n<m) {x=a1;y=a2;}
-    else {x=a2;y=a1;}
-    for (int i = 0; i < x.size(); i++)
-    {
-        cou[x[i]].first=1;
-        cou[x[i]].second=i;
+typedef pair<long long, long long> pl;
+pl pairl[1000];
+struct Comp{
+    constexpr bool operator()(pl const &a, pl const &b){
+        if(a.second == b.second) return a.first<b.first;
+        return a.second<b.second;
     }
-    for (int i = 0; i < y.size(); i++)
+};
+
+int main(){
+    priority_queue<pl,vector<pl>,Comp>p;
+    int n;
+    cin>>n;
+    for (int i = 0; i < n; i++)
     {
-        if(cou[y[i]].first==1)
+        cin>>pairl[i].first>>pairl[i].second;
+        p.push(pairl[i]);
     }
-    
-    
-    
+    while(!p.empty()){
+        cout<<p.top().first<<" "<<p.top().second<<endl;
+        p.pop();
+    }
 }
