@@ -29,10 +29,43 @@ app.use(express.json());
 
 //aws
 import aws from "aws-sdk";
-import `dotenv/config`;
+import "dotenv/config";
 
 //aws setup
+const region= "";
+const bucketName="ecom-website";
+const accessKeyId= process.env.AWS_ACCESS_KEY;
+const aecretAccessKey= process.env.AWS_ACCESS_KEY;
 
+aws.config.update({
+    region,
+    accessKeyId,
+    secretAccessKey
+})
+
+//init s3
+const s3= new aws.S3();
+
+//generate image url
+async function generateURL(){
+    let date= new Date();
+
+    const imageName = `${date.getTime()}.jpeg`;
+
+    const params= {
+        Bucket : bucketName,
+        Key: imageName,
+        Expires: 300,
+        ContentType: "image/jpeg"
+    }
+
+    const uploadURL = await s3.getSignedUrlPromise("putObject", params);
+    return uploadURL;
+}
+
+app.get('/s3url', (req,res)=>{
+    generateURL().then(url => res.json(url));
+})
 
 //routes
 //home route
