@@ -55,7 +55,7 @@ let addProductBtn = document.querySelector('.add-product-btn');
 let loader = document.querySelector('.loeader');
 
 let productName= document.querySelector('.product-name');
-let shortDes = document.querySelector('.product.des');
+let shortDes = document.querySelector('.product-des');
 let price = document.querySelector('.price');
 let detail = document.querySelector('.des');
 let tags = document.querySelector('.tags');
@@ -65,5 +65,34 @@ addProductBtn.addEventListener('click', ()=>{
     //verification
     if(productName.innerHTML == productName.getAttribute('data-placeholder')){
         showFormError('should enter product name');
+    } else if(shortDes.innerHTML == shortDes.getAttribute('data-placeholder')){
+        showFormError('short des must be 80 letters long');
+    } else if(price.innerHTML == price.getAttribute('data-placeholder') || !Number(price.innerHTML)){
+        showFormError('enter valid price');
+    } else if(detail.innerHTML == detail.getAttribute('data-placeholder')){
+        showFormError('must enter the detail');
+    } else if(tags.innerHTML == tags.getAttribute('data-placeholder')){
+        showFormError('enter tags');
+    } else{
+        //submit form
+        loader.style.dispaly= 'block';
+        let data = productData();
+        sendData('/add-product',data);
     }
 })
+
+const productData = () =>{
+    let tagsArr= tags.innerText.split(",");
+    tagsArr.forEach((item, i) => tagsArr[i].trim().toLowerCase());
+
+    return {
+        name: productName.innerText,
+        shortDes: shortDes.innerText,
+        price: price.innerText,
+        detail: detail.innerText,
+        tags: tagsArr,
+        image: imagePath,
+        imail: JSON.parse(sessionStorage.user).email,
+        draft: false
+    }
+}

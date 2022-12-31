@@ -28,7 +28,7 @@ app.use(express.static('public'));
 app.use(express.json());
 
 //aws
-import aws from "aws-sdk";
+import aws, { DataPipeline, RDS } from "aws-sdk";
 import "dotenv/config";
 
 //aws setup
@@ -190,6 +190,34 @@ app.get('/dashboard', (req,res) =>{
 //app product
 app.get('/add-product', (req,res) =>{
     res.sendFile('add-product.html', {root: "public"});
+})
+
+app.post('/add-product', (req,res) =>{
+    let{ name, shortDes, detail, price, image, tags, email, draft} = req.body;
+
+    if(!name.length){
+        res.json({'alert' :'should enter product name'});
+    } else if(!shortDes.length){
+        res.json({'alert' :'short des must be 80 letters long'});
+    } else if(!price.length || !Number(price)){
+        res.json({'alert' :'enter valid price'});
+    } else if(!detail.length){
+        res.json({'alert' :'must enter the detail'});
+    } else if(!tags.length){
+        res.json({'alert' :'enter tags'});
+    }
+
+    //add-product
+    let docName = `${name.toLowerCase()}-${Math.floor(Math.random()*50000)}`
+
+    let products = collection(db, "products");
+    setDoc(doc(products,docName), req.body)
+    .then(data =>{
+        res.json({'product' : name})
+    })
+    .catch(err =>{
+        res.json({'alert': 'some error occured.'})
+    })
 })
 
 //404route
