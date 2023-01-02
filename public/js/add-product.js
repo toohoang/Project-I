@@ -77,6 +77,9 @@ addProductBtn.addEventListener('click', ()=>{
         //submit form
         loader.style.dispaly= 'block';
         let data = productData();
+        if(productId){
+            data.id= productId; 
+        }
         sendData('/add-product',data);
     }
 })
@@ -95,4 +98,53 @@ const productData = () =>{
         imail: JSON.parse(sessionStorage.user).email,
         draft: false
     }
+}
+
+//draft btn
+let draftBtn=document.querySelector('.draft-btn');
+
+draftBtn.addEventListener('click', () =>{
+    if(!productName.innerHTML.length || productName.innerHTML == productName.getAttribute('data-placeholder')){
+        showFormError('enter product name atleast');
+    } else{
+        let data = productData();
+        loader.style.dispaly= 'block';
+        data.draft=true;
+        if(productId){
+            data.id= productId; 
+        }
+        sendData('/add-product',data);
+    }
+})
+
+//edit page
+
+let productId = null;
+if(location.pathname != '/add-product'){
+    productId=decodeURI(location.pathname.split('/').pop());
+    fetchProductData();
+}
+
+const fetchProductData=()=>{
+    addProductBtn.innerHTML='save product';
+    fetch('/get-products',{
+        method:'post',
+        headers:new Headers({'Content-type' : 'application/json'}),
+        body: JSON.stringify({id: productId})
+    }).then(res =>res.json())
+    .then(data =>{
+        setFormData(data)
+    })
+    .catch(err => console.log(err))
+}
+
+const setFormData=(data) =>{
+    productName.innerHTML=data.name;
+    shortDes.innerHTML=data.shortDes;
+    price.innerHTML=data.price;
+    detail.innerHTML=data.detail;
+    tags.innerHTML=data.tags;
+
+    let productImg=document.querySelector('.product-img')
+    productImg.src=imagePath=data.image;
 }

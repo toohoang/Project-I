@@ -1,15 +1,26 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-int main() {
-    int index, pos=0;
-    string a="to cao to ot to taa";
-    string b="to";
-    int count=0;
-    while((index=a.find(b,pos)) != string::npos){
-        cout<<"position: "<<index<<endl;
-        pos=index+1;
+class solution{
+public:
+    vector<vector<int>> res;
+    void solve(int i, vector<int>&arr, vector<int>&tmp, int target){
+        if(target==0){
+            res.push_back(tmp);
+            return;
+        }
+        if(target<0) return ;
+        if(i==arr.size()) return ;
+
+        solve(i+1,arr,tmp,target);
+        tmp.push_back(arr[i]);
+        solve(i,arr,tmp,target-arr[i]);
+        tmp.pop_back();
     }
-    cout<<count;
-    return 0;
-}
+    vector<vector<int>> combinationSum(vector<int>&a, int target){
+        res.clear();
+        vector<int>tmp;
+        solve(0, a,tmp,target);
+        return res;
+    }
+};

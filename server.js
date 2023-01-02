@@ -1,7 +1,7 @@
 import express from "express";
 import bcrypt, { hash } from "bcrypt";
 import { initializeApp } from "firebase/app";
-import { getFirestore, doc, collection, setDoc, updateDoc, getDoc } from "firebase/firestore";
+import { getFirestore, doc, collection, setDoc, updateDoc, getDocs, query,where, deleteDoc } from "firebase/firestore";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -192,23 +192,29 @@ app.get('/add-product', (req,res) =>{
     res.sendFile('add-product.html', {root: "public"});
 })
 
-app.post('/add-product', (req,res) =>{
-    let{ name, shortDes, detail, price, image, tags, email, draft} = req.body;
+app.get('/add-product/:id', (req,res) =>{
+    res.sendFile('add-product.html', {root: "public"});
+})
 
-    if(!name.length){
-        res.json({'alert' :'should enter product name'});
-    } else if(!shortDes.length){
-        res.json({'alert' :'short des must be 80 letters long'});
-    } else if(!price.length || !Number(price)){
-        res.json({'alert' :'enter valid price'});
-    } else if(!detail.length){
-        res.json({'alert' :'must enter the detail'});
-    } else if(!tags.length){
-        res.json({'alert' :'enter tags'});
+app.post('/add-product', (req,res) =>{
+    let{ name, shortDes, detail, price, image, tags, email, draft,id} = req.body;
+
+    if(!draft){
+        if(!name.length){
+            res.json({'alert' :'should enter product name'});
+        } else if(!shortDes.length){
+            res.json({'alert' :'short des must be 80 letters long'});
+        } else if(!price.length || !Number(price)){
+            res.json({'alert' :'enter valid price'});
+        } else if(!detail.length){
+            res.json({'alert' :'must enter the detail'});
+        } else if(!tags.length){
+            res.json({'alert' :'enter tags'});
+        }
     }
 
     //add-product
-    let docName = `${name.toLowerCase()}-${Math.floor(Math.random()*50000)}`
+    let docName=id== undefined ? `${name.toLowerCase()}-${Math.floor(Math.random()*50000)}` :id;
 
     let products = collection(db, "products");
     setDoc(doc(products,docName), req.body)
@@ -218,6 +224,61 @@ app.post('/add-product', (req,res) =>{
     .catch(err =>{
         res.json({'alert': 'some error occured.'})
     })
+})
+
+app.post('/get-products', (req,res) =>{
+    let {email, id, tag} = req.body
+
+    let products = collection(db, "products");
+    let docRef;
+
+    if(id){
+        docRef= getDoc(doc(products, id));
+    } else {
+        docRef= getDocs(query(products,where("email", "==", email)))
+    }
+    docRef= getDocs(query(products, where("email" , "==", email)))
+
+    docRef.then(products =>{
+        if(products.empty){
+            return res.json('no products');
+        }
+        let productArr= [];
+
+        if(id){
+            return res.json(product.data());
+        } else if(tag){
+            docRef=getDocs(query(products, where("tags"," array-contains",tag)))
+        } else{
+            product.forEach(item =>{
+                let data = item.data();
+                data.id= item.id;
+                productArr.push(data);
+            })
+        }
+        
+
+        res.json(productArr);
+    })
+})
+
+app.post('/delete-product', (req,res) =>{
+    let {id} = req.body;
+
+    deleteDoc(doc(collection(db, "products"), id))
+    .then(data =>{
+        res.json('sucess');
+    }).catch(err =>{
+        res.json('err');
+    })
+})
+
+app.get('/products/:id', (req,res) =>{
+    res.sendFile("product.html", {root: "public"})
+})
+
+app.get('/search/:key', (req,res) =>{
+    res.sendFile("search.html" ,{root: "public"})
 })
 
 //404route
