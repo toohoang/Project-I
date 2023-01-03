@@ -1,7 +1,7 @@
 import express from "express";
 import bcrypt, { hash } from "bcrypt";
 import { initializeApp } from "firebase/app";
-import { getFirestore, doc, collection, setDoc, updateDoc, getDocs, query,where, deleteDoc } from "firebase/firestore";
+import { getFirestore, doc, collection, setDoc, updateDoc, getDocs, query,where, deleteDoc, limit, getDoc } from "firebase/firestore";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -279,6 +279,57 @@ app.get('/products/:id', (req,res) =>{
 
 app.get('/search/:key', (req,res) =>{
     res.sendFile("search.html" ,{root: "public"})
+})
+
+//review routes
+app.post('/add-review', (req,res) =>{
+    let {headline, review, rate,email, product} =req.body;
+    //form validation
+    if(!headline.value.length || !review.length || rate==0 || email==null || !productId){
+        return res.json({'alert': 'Fill all the inputs'});
+    } 
+    //storing in Firestore
+    let reviews = collection(db, "reviews");
+    let docName=`review-${email}-${product}`;
+    
+    setDoc(doc(reviews, docName), req.body)
+    .then(data =>{
+        return res.json('review')
+    }).catch(err => {
+        console.log(err)
+        res.json({'alert': 'some error occured'})
+    });
+})
+
+app.post('/get-reviews', (req,res) =>{
+    let {product, email} =req.body;
+    let reviews = collection(db,"review");
+
+    getDocs(query(reviews, where ("product", "==", product)), limit(4))
+    .then(review =>{
+        let reviewArr = [];
+
+        if(review.empty){
+            return res.json(reviewErr);
+        }
+
+        let userEmail= false;
+
+        review.forEach((item,i) =>{
+            let reivewEmail = item.data().email;
+            if(reviewEmail == email){
+                userEmail=true;
+            }
+            reviewArr.push(item.data())
+        })
+
+        if(!userEmail){
+            getDoc(doc(reviews, `review-${email}-${product}`))
+            .then(data => reviewArr.push(data.data()))
+        }
+
+        return res.json(reviewArr);
+    })
 })
 
 //404route
